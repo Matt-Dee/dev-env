@@ -1,0 +1,123 @@
+---
+#- hosts: testserver
+- hosts: 127.0.0.1
+  remote_user: root
+  tasks:
+  - name: install vim
+    yum: name=vim state=latest
+
+  - name: install git
+    yum: name=git state=latest
+
+  - name: clone elasticsearch
+    git:
+      repo: 'https://github.com/elastic/ansible-elasticsearch.git'
+      dest: /srv/elastic
+      version: master
+
+  #############################################################################################################
+  #                                         Set up fluentd service 
+  #############################################################################################################
+  - name: pull td agent
+    shell: 'curl -L https://toolbelt.treasuredata.com/sh/install-redhat-td-agent2.sh | sh'
+
+  - copy:
+      src: '{{ playbook_dir }}/td-agent/td-agent.conf'
+      dest: /etc/td-agent/td-agent.conf 
+      owner: root
+      group: root
+      mode: 0644
+
+  - copy:
+      src: '{{ playbook_dir }}/td-agent/td-agent.service'
+      dest: /etc/init.d/td-agent
+      owner: root
+      group: root
+      mode: 0755
+
+  - name: run td-agent
+    service: name=td-agent state=started enabled=yes
+  #############################################################################################################
+  #                                        End set up fluentd service 
+  #############################################################################################################
+
+  #############################################################################################################
+  #                                             Set up intellij 
+  #############################################################################################################
+  - name: pull td agent
+#    shell: 'mkdir ~/dev-tools/; curl -L https://www.jetbrains.com/idea/download/download-thanks.html?platform=linux&code=IIC --output ~/dev-tools/'
+#    shell: 'mkdir ~/dev-tools/; curl -L https://download-cf.jetbrains.com/idea/ideaIC-2017.2.5.tar.gz --output ~/dev-tools/'
+    shell: 'mkdir ~/dev-tools/; curl -o ~/dev-tools/intellij.tar.gz https://download-cf.jetbrains.com/idea/ideaIC-2017.2.5.tar.gz; tar xvzf ~/dev-tools/intellij.tar.gz -C ~/dev-tools/'
+ 
+    
+#     https://download-cf.jetbrains.com/idea/ideaIC-2017.2.5.tar.gz
+  #############################################################################################################
+  #                                           End set up intellij 
+  #############################################################################################################
+
+  #############################################################################################################
+  #                                          Set up fluentd service 
+  #############################################################################################################
+  - copy:
+      src: '{{ playbook_dir }}/logstash/logstash.repo'
+      dest: /etc/yum.repos.d/logstash.repo
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: install logstash
+    yum: name=logstash state=latest
+
+  - name: run logstash
+    service: name=logstash state=started enabled=yes
+  #############################################################################################################
+  #                                        End set up fluentd service 
+  #############################################################################################################
+
+  #############################################################################################################
+  #                                          Set up kibana service 
+  #############################################################################################################
+  - copy:
+      src: '{{ playbook_dir }}/kibana/kibana.repo'
+      dest: /etc/yum.repos.d/kibana.repo
+      owner: root
+      group: root
+      mode: 0644
+
+  - name: install kibana
+    yum: name=kibana state=latest
+
+  - name: run kibana
+    service: name=kibana state=started enabled=yes
+  #############################################################################################################
+  #                                        End set up kibana service 
+  #############################################################################################################
+
+  #############################################################################################################
+  #                                        Set up Elasticsearch service 
+  #############################################################################################################
+- name: Elasticsearch with custom configuration
+  hosts: localhost
+  roles:
+    #expand to all available parameters
+    - { role: elastic.elasticsearch, es_instance_name: "node1", es_data_dirs: "/opt/elasticsearch/data", es_log_dir: "/opt/elasticsearch/logs", 
+    es_config: {
+        node.name: "node1", 
+        cluster.name: "custom-cluster",
+        discovery.zen.ping.unicast.hosts: "localhost:9300",
+        http.port: 9200,
+        transport.tcp.port: 9300,
+        node.data: false,
+        node.master: true,
+        bootstrap.memory_lock: true,
+        } 
+    }
+  vars:
+    es_scripts: false
+    es_templates: false
+    es_version_lock: false
+    es_heap_size: 1g
+    es_api_port: 9200
+  #############################################################################################################
+  #                                       End set up Elasticsearch service 
+  #############################################################################################################
