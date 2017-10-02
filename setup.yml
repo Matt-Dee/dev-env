@@ -3,6 +3,9 @@
 - hosts: 127.0.0.1
   remote_user: root
   tasks:
+  - name: install java-1.8.0-openjdk
+    yum: name=java-1.8.0-openjdk state=latest
+
   - name: install vim
     yum: name=vim state=latest
 
