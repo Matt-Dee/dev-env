@@ -1,0 +1,15 @@
+---
+- hosts: 127.0.0.1
+  remote_user: root
+  tasks:
+  - name: install vim
+    yum: name=vim state=latest
+
+  - name: install git
+    yum: name=git state=latest
+
+  - name: clone elasticsearch
+    git:
+      repo: 'https://github.com/elastic/ansible-elasticsearch.git'
+      dest: /etc/ansible/roles/elastic.elasticsearch
+      version: master
