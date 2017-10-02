@@ -12,7 +12,7 @@
   - name: clone elasticsearch
     git:
       repo: 'https://github.com/elastic/ansible-elasticsearch.git'
-      dest: /srv/elastic
+      dest: /etc/ansible/roles/elastic.elasticsearch
       version: master
 
   #############################################################################################################
