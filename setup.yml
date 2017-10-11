@@ -12,12 +12,6 @@
   - name: install git
     yum: name=git state=latest
 
-  - name: clone elasticsearch
-    git:
-      repo: 'https://github.com/elastic/ansible-elasticsearch.git'
-      dest: /etc/ansible/roles/elastic.elasticsearch
-      version: master
-
   #############################################################################################################
   #                                         Set up fluentd service 
   #############################################################################################################
@@ -48,12 +42,7 @@
   #                                             Set up intellij 
   #############################################################################################################
   - name: pull td agent
-#    shell: 'mkdir ~/dev-tools/; curl -L https://www.jetbrains.com/idea/download/download-thanks.html?platform=linux&code=IIC --output ~/dev-tools/'
-#    shell: 'mkdir ~/dev-tools/; curl -L https://download-cf.jetbrains.com/idea/ideaIC-2017.2.5.tar.gz --output ~/dev-tools/'
     shell: 'mkdir ~/dev-tools/; curl -o ~/dev-tools/intellij.tar.gz https://download-cf.jetbrains.com/idea/ideaIC-2017.2.5.tar.gz; tar xvzf ~/dev-tools/intellij.tar.gz -C ~/dev-tools/'
- 
-    
-#     https://download-cf.jetbrains.com/idea/ideaIC-2017.2.5.tar.gz
   #############################################################################################################
   #                                           End set up intellij 
   #############################################################################################################
