@@ -4,34 +4,36 @@
   remote_user: root
   tasks:
   #############################################################################################################
-  #                                         Set up fluentd service 
+  #                                         Tear down fluentd service 
   #############################################################################################################
   - name: remove td-agent
     action: yum pkg=td-agent state=removed
   #############################################################################################################
-  #                                        End set up fluentd service 
+  #                                        End tear down fluentd service 
   #############################################################################################################
 
   #############################################################################################################
-  #                                          Set up fluentd service 
+  #                                          Tear down fluentd service 
   #############################################################################################################
   - name: run logstash
     action: yum pkg=logstash state=removed
   #############################################################################################################
-  #                                        End set up fluentd service 
+  #                                        End tear down fluentd service 
   #############################################################################################################
 
   #############################################################################################################
-  #                                          Set up kibana service 
+  #                                          Tear down kibana service 
+  # Can't completely remove kibana, because you can never install it again and hav it run.  There seems to 
+  # be a bug that pops up if you reinstall.                                         
   #############################################################################################################
-  - name: remove kibana
-    action: yum pkg=kibana state=removed
+  - name: run kibana
+    service: name=kibana state=stopped enabled=no
   #############################################################################################################
-  #                                        End set up kibana service 
+  #                                        End tear down kibana service 
   #############################################################################################################
 
   #############################################################################################################
-  #                                        Set up Elasticsearch service 
+  #                                        Tear down Elasticsearch service 
   #############################################################################################################
   - name: remove node1_elasticsearch
     action: yum pkg=node1_elasticsearch state=removed
@@ -42,5 +44,5 @@
   - name: remove elasticsearch role
     shell: 'rm -rf /etc/ansible/roles/elastic.elasticsearch'
   #############################################################################################################
-  #                                       End set up Elasticsearch service 
+  #                                       End tear down Elasticsearch service 
   #############################################################################################################
